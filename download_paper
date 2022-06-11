@@ -1,0 +1,71 @@
+from fileinput import filename
+import os
+from turtle import onclick
+from logging import exception
+from selenium import webdriver
+from time import sleep
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from urllib.request import urlretrieve
+
+
+try:
+    with open('paper_title.txt','r') as f:
+        datalist = f.readlines() 
+    
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    browser = webdriver.Chrome(executable_path="D:/11.My-job/2022_10_06 Uploadfile/chromedriver.exe", options=options)
+    browser.get("https://sci-hub.se/")
+    sleep(2)
+
+    for data in datalist:
+        if(data == '2014\n'):
+            # os.mkdir("./2014")
+            print(2014)
+            download_path = "D:\\11.My-job\\2022_10_06 Uploadfile\\2014\\"
+            with open('paper_not_exist.txt', 'a') as k:
+                    k.write(str(2014))
+        elif(data == '2015\n'):
+            # os.mkdir("./2015")
+            print(2015)
+            download_path = "D:\\11.My-job\\2022_10_06 Uploadfile\\2015\\"
+            with open('paper_not_exist.txt', 'a') as k:
+                    k.write(str(2015))
+        elif(data == '2016\n'):
+            # os.mkdir("./2016")
+            print(2016)
+            download_path = "D:\\11.My-job\\2022_10_06 Uploadfile\\2016\\"
+            with open('paper_not_exist.txt', 'a') as k:  
+                    k.write(str(2016))
+        else:
+            print(data.split(sep=".")[0])
+            search = browser.find_element(by=By.XPATH, value="/html/body/div[1]/div[1]/form/div/textarea")
+            search.send_keys(Keys.CONTROL + "a")
+            search.send_keys(Keys.DELETE)
+            search.send_keys(data)
+            sleep(2)
+            if(len(browser.find_elements(By.ID, value="smile"))>0):
+                print("Can't find paper")
+                with open('paper_not_exist.txt', 'a') as k:
+                    k.write(data)
+            else:
+                print("Found out paper")
+                download_btn = browser.find_element(by=By.XPATH, value="/html/body/div[3]/div[1]/button")
+                download_file = data.split(sep=".")[0]
+                namefile = str(download_path) + str(download_file) + ".pdf"
+                download_href = browser.find_element(by=By.XPATH, value="/html/body/div[4]/embed").get_attribute("src").split(sep="#")[0]+"?download=true"
+                print(download_href+"\n")
+                urlretrieve(download_href, namefile)
+            browser.back()
+        sleep(5)    
+
+
+    browser.close()
+
+except(exception):
+# 6. Đóng browser
+    print(exception)
+    browser.close()
